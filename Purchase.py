@@ -6,7 +6,8 @@ class Purchase:
 
     def internetPackage(self, packageDeal):
         
-        totalPrice += 200
+        if packageDeal == True:
+            totalPrice += 200
     
     def incTotalPhoneLines(self):
         
@@ -45,7 +46,12 @@ class Purchase:
             totalPrice -= 900
 
     def buyMessage(self):
-        "Your purchase has been confirmed"
+
+        if totalPrice == 0:
+            "Dear user, your cart is empty. You need to purchase one or more items listed in the shop."
+        
+        elif totalPrice > 0: 
+            "Your purchase has been confirmed"
        
 
 
