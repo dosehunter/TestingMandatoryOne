@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>KEANet</title>
+</head>
+<body>
+<h1>KEANet</h1>
+<div>
+    <input onclick="chkInternetConnection(this)" type="checkbox" id="chkInternetConnection">
+    <label for="chkInternetConnection">Internet connection</label>
+    <br>
+    <label for="txtPhoneLines">Phone lines</label>
+    <input onchange="chkPhoneLines(this.value)" type="number" id="txtPhoneLines" value="0">
+    <br>
+    <label for="cmbCellPhones">Cell phones:</label>
+    <br>
+    <table>
+        <tr>
+            <td>
+                <select id="txtCellPhones" size="5">
+                    <option value="moto">Motorola G99</option>
+                    <option value="iphone">iPhone 99</option>
+                    <option value="samsung">Samsung Galaxy 99</option>
+                    <option value="sony">Sony Xperia 99</option>
+                    <option value="huawei">Huawei 99</option>
+                </select>
+            </td>
+            <td>
+                <input onclick="addPhone()" id="btn_right" type="button" value="&gt;">
+                <br>
+                <input onclick="removePhone()" id="btn_left" type="button" value="&lt;">
+            </td>
+            <td>
+                <select id="txtChosenCellPhones" size="5" style="width: 150px">
+                </select>
+            </td>
+        </tr>
+    </table>
+    <br>
+    <span id="totalPrice" >Total price: 0 DKK</span>
+    <br>
+
+
+    <form id="buyForm" onsubmit="return validateForm()" action="/checkout" method="post">
+        <input id="checkBuy" type="submit" value="Buy">
+    </form>
+
+</div>
+
+<!-- I should have just used JQuery for this...-->
+<script language="JavaScript" type="text/javascript">
+    var price = 0;
+    var priceName = "Total price: ";
+    var priceCurrency = " DKK";
+
+    var internetConnection = false;
+    var numberOfPhoneLines = 0;
+    var phonesChosen = [];
+
+    function updatePrice(){
+        tmpPrice = price + (numberOfPhoneLines * 150)
+        document.getElementById("totalPrice").textContent=(priceName + tmpPrice + priceCurrency);
+    }
+
+    function addPhone(obj){
+        var phoneOptions = document.getElementById("txtCellPhones");
+        var wantedPhones = document.getElementById("txtChosenCellPhones");
+        var phonePicked = phoneOptions.options[phoneOptions.selectedIndex].cloneNode(true);
+        wantedPhones.appendChild(phonePicked);
+
+        // HARDCODING FOR NOW
+        if (phonePicked.value == "moto")
+            price += 800
+        else if (phonePicked.value == "iphone")
+            price += 6000
+        else if (phonePicked.value == "samsung")
+            price += 1000
+        else if (phonePicked.value == "sony")
+            price += 900
+        else if (phonePicked.value == "huawei")
+            price += 900
+
+        phonesChosen.push(phonePicked.value);
+        updatePrice();
+    }
+
+    function removePhone(){
+        var wantedPhones = document.getElementById("txtChosenCellPhones");
+        var phonePicked =  wantedPhones.options[wantedPhones.selectedIndex];
+        phonePicked.remove();
+        //wantedPhones.options[wantedPhones.selectedIndex].remove();
+
+        // HARDCODING FOR NOW
+        if (phonePicked.value == "moto")
+            price -= 800
+        else if (phonePicked.value == "iphone")
+            price -= 6000
+        else if (phonePicked.value == "samsung")
+            price -= 1000
+        else if (phonePicked.value == "sony")
+            price -= 900
+        else if (phonePicked.value == "huawei")
+            price -= 900
+
+        const index = phonesChosen.indexOf(phonePicked.value);
+        if (index > -1)
+            phonesChosen.splice(index, 1)
+
+        updatePrice()
+    }
+
+    function chkInternetConnection(obj){  // obj not used?
+        var checked = document.getElementById("chkInternetConnection").checked
+        if (checked == true){
+            price += 200;
+            internetConnection = true;
+        }
+        else {
+            price -= 200;
+            internetConnection = false;
+        }
+        updatePrice()
+    }
+
+    function chkPhoneLines(value){
+        numberOfPhoneLines = value
+        updatePrice()
+    }
+
+    function validateForm() {
+        var form = document.getElementById("buyForm")
+        if (!internetConnection && numberOfPhoneLines === 0 && phonesChosen.length === 0){
+            alert("CART IS EMPTY!")
+            return false;
+        }
+
+        // Yea... I don't know what I'm doing
+        phonesIn = document.createElement('input');
+        phonesIn.setAttribute('name', 'phones');
+        phonesIn.setAttribute('type', 'hidden');
+        phonesIn.setAttribute('value', phonesChosen);
+
+        phoneLineIn = document.createElement('input');
+        phoneLineIn.setAttribute('name', 'phoneLine');
+        phoneLineIn.setAttribute('type', 'hidden');
+        phoneLineIn.setAttribute('value', numberOfPhoneLines);
+
+        internetIn = document.createElement('input');
+        internetIn.setAttribute('name', 'internet');
+        internetIn.setAttribute('type', 'hidden');
+        internetIn.setAttribute('value', internetConnection);
+
+        form.appendChild(phonesIn);
+        form.appendChild(phoneLineIn);
+        form.appendChild(internetIn);
+        document.body.appendChild(form);
+
+        return true;
+    }
+
+
+</script>
+</body>
+</html>
