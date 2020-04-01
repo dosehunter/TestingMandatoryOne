@@ -2,25 +2,36 @@ class Purchase:
 
     totalPrice = 0
     phoneLines = 0
+    chosenPhones = []
     cellPhones = ["Motorola G99", "iPhone 99", "Samsung Galaxy 99", "Sony Xperia 99", "Huawei 99"]
 
     def __init__ (self):
         pass
 
-    def is_even(self, number):
-        return number % 2 == 0
 
     def internetPackage(self, packageDeal):
-        
         if packageDeal == True:
             self.totalPrice += 200
+        else:
+            self.totalPrice -= 200
+
+        return self.totalPrice
     
     def incTotalPhoneLines(self):
-        self.totalPrice += self.phoneLines * 150
+        if self.phoneLines >= 8:
+            return self.totalPrice
+
+        self.phoneLines += 1
+        self.totalPrice += 150
+        return self.totalPrice
 
     def decTotalPhoneLines(self):
-        
-        self.totalPrice -= self.phoneLines * 150
+        if self.phoneLines == 0:
+            return self.totalPrice
+
+        self.phoneLines -= 1
+        self.totalPrice -= 150
+        return self.totalPrice
 
     def selectCellphone(self, phoneModel):
         
@@ -37,6 +48,11 @@ class Purchase:
             self.totalPrice += 900
         else:
             print("Phone model not found!")
+            return self.totalPrice
+
+        self.chosenPhones.append(phoneModel)
+
+        return self.totalPrice
 
     def unselectCellphone(self, phoneModel):
         
@@ -53,12 +69,16 @@ class Purchase:
             self.totalPrice -= 900
         else:
             print("Phone model not found!")
+            return self.totalPrice
+
+        self.chosenPhones.remove(phoneModel)
+
+        return self.totalPrice
 
     def buyMessage(self):
 
         if self.totalPrice == 0:
-            "Dear user, your cart is empty. You need to purchase one or more items listed in the shop."
+            return "Dear user, your cart is empty. You need to purchase one or more items listed in the shop."
         
-        elif self.totalPrice > 0:
-            "Your purchase has been confirmed"
+        print("Your purchase has been confirmed")
 
