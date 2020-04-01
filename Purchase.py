@@ -1,84 +1,92 @@
 class Purchase:
+    alert_string = "Dear user, your cart is empty. You need to purchase one or more items listed in the shop."
+    cell_phones = ["Motorola G99", "iPhone 99", "Samsung Galaxy 99", "Sony Xperia 99", "Huawei 99"]
 
-    totalPrice = 0
-    phoneLines = 0
-    chosenPhones = []
-    cellPhones = ["Motorola G99", "iPhone 99", "Samsung Galaxy 99", "Sony Xperia 99", "Huawei 99"]
+    def __init__ (self, total_price=0, chosen_phones=None, phone_lines=0, internet_connection=False):
+        self.total_price = total_price
+        if chosen_phones is None:
+            chosen_phones = []
+        self.chosen_phones = chosen_phones
+        self.phone_lines = phone_lines
+        self.internet_connection = internet_connection
 
-    def __init__ (self):
-        pass
 
-
-    def internetPackage(self, packageDeal):
-        if packageDeal == True:
-            self.totalPrice += 200
+    def internet_package(self, package_deal):
+        if package_deal == True:
+            self.total_price += 200
         else:
-            self.totalPrice -= 200
+            self.total_price -= 200
 
-        return self.totalPrice
+        self.internet_connection = package_deal
+
+        return self.total_price
     
-    def incTotalPhoneLines(self):
-        if self.phoneLines >= 8:
-            return self.totalPrice
+    def inc_total_phone_lines(self):
+        if self.phone_lines >= 8:
+            return self.total_price
 
-        self.phoneLines += 1
-        self.totalPrice += 150
-        return self.totalPrice
+        self.phone_lines += 1
+        self.total_price += 150
+        return self.total_price
 
-    def decTotalPhoneLines(self):
-        if self.phoneLines == 0:
-            return self.totalPrice
+    def dec_total_phone_lines(self):
+        if self.phone_lines == 0:
+            return self.total_price
 
-        self.phoneLines -= 1
-        self.totalPrice -= 150
-        return self.totalPrice
+        self.phone_lines -= 1
+        self.total_price -= 150
+        return self.total_price
 
-    def selectCellphone(self, phoneModel):
+    def select_cellphone(self, phone_model):
         
-        if phoneModel == self.cellPhones[0]:
-            self.totalPrice += 800
+        if phone_model == self.cell_phones[0]:
+            self.total_price += 800
         
-        elif phoneModel == self.cellPhones[1]:
-            self.totalPrice += 6000
+        elif phone_model == self.cell_phones[1]:
+            self.total_price += 6000
 
-        elif phoneModel == self.cellPhones[2]:
-            self.totalPrice += 1000
+        elif phone_model == self.cell_phones[2]:
+            self.total_price += 1000
 
-        elif phoneModel == self.cellPhones[3] or phoneModel == self.cellPhones[4]:
-            self.totalPrice += 900
+        elif phone_model == self.cell_phones[3] or phone_model == self.cell_phones[4]:
+            self.total_price += 900
         else:
             print("Phone model not found!")
-            return self.totalPrice
+            return self.total_price
 
-        self.chosenPhones.append(phoneModel)
+        self.chosen_phones.append(phone_model)
 
-        return self.totalPrice
+        return self.total_price
 
-    def unselectCellphone(self, phoneModel):
+    def unselect_cellphone(self, phone_model):
+        if phone_model == self.cell_phones[0]:
+            self.total_price -= 800
         
-        if phoneModel == self.cellPhones[0]:
-            self.totalPrice -= 800
-        
-        elif phoneModel == self.cellPhones[1]:
-            self.totalPrice -= 6000
+        elif phone_model == self.cell_phones[1]:
+            self.total_price -= 6000
 
-        elif phoneModel == self.cellPhones[2]:
-            self.totalPrice -= 1000
+        elif phone_model == self.cell_phones[2]:
+            self.total_price -= 1000
 
-        elif phoneModel == self.cellPhones[3] or phoneModel == self.cellPhones[4]:
-            self.totalPrice -= 900
+        elif phone_model == self.cell_phones[3] or phone_model == self.cell_phones[4]:
+            self.total_price -= 900
         else:
             print("Phone model not found!")
-            return self.totalPrice
+            return self.total_price
 
-        self.chosenPhones.remove(phoneModel)
+        self.chosen_phones.remove(phone_model)
 
-        return self.totalPrice
+        return self.total_price
 
-    def buyMessage(self):
+    def buy_message(self):
 
-        if self.totalPrice == 0:
-            return "Dear user, your cart is empty. You need to purchase one or more items listed in the shop."
-        
-        print("Your purchase has been confirmed")
+        if (self.chosen_phones is None or len(self.chosen_phones) == 0) \
+                and self.internet_connection == False \
+                and self.phone_lines <= 0 or self.total_price <= 0:
 
+            return self.alert_string
+
+        if self.total_price <= 0:
+            return self.alert_string
+
+        print("Your purchase have been confirmed")
