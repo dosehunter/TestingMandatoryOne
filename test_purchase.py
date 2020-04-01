@@ -1,6 +1,10 @@
 import pytest
 from Purchase import Purchase
 
+# How to run pytest:
+# In console/terminal:
+# py.test --junitxml test_results/results.xml test_purchase.py
+
 class Test:
     @pytest.fixture()
     def resource(self):
@@ -8,6 +12,7 @@ class Test:
         yield "resource"
         print("teardown")
 
+    # How to do dataproviders:
     @pytest.mark.parametrize("number, expected", [
         (2, True),
         (3, False),
