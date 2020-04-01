@@ -31,12 +31,14 @@ class Test:
 
 
     def test_internetPackage(self):
+        assert 1 == 5
         pass
 
     def test_incTotalPhoneLines(self):
         pass
 
     def test_decTotalPhoneLines(self):
+        assert 2 == 3
         pass
 
     def test_selectCellphone(self):
