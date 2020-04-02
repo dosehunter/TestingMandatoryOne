@@ -9,6 +9,10 @@ class TestSplitter:
         splitter = Splitter()
         yield splitter
 
+    # input = Post body like input
+    # expected_phone_lines = amount of phone lines
+    # expected_phones = list of phones
+    # expected_internet = if internet i selected
     @pytest.mark.parametrize("input, expected_phone_lines, expected_phones, expected_internet", [
         (b'phones=Motorola+G99%2CHuawei+99&phoneLine=-1&internet=false'         , -1    , ["Motorola G99", "Huawei 99"]             , False),
         (b'phones=Motorola+G99&phoneLine=0&internet=false'                      , 0     , ["Motorola G99"]                          , False),
