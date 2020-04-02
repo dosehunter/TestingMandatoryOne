@@ -5,21 +5,25 @@ from Purchase import Purchase
 # py.test --junitxml test_results/results.xml test_purchase.py -v
 
 
-class Test:
+class TestPurchase:
 
-    # Fixture which will create our test class
-    # yield is preffered as we will still get to tear down anything afterwards, like an open file
+    # Fixture with empty Purchase test
+    # yield is preferred as we will still get to tear down anything afterwards, like an open file
     @pytest.fixture()
     def purchase(self):
-        p = Purchase()      # Instantiating a new Purchase class
+        p = Purchase()
         yield p
 
-        del p               # This should not be necessary
+    # Fixture with total price=10000 and internet selected
+    @pytest.fixture()
+    def purchase_internet(self):
+        p = Purchase(10000, [], 0, True)
+        yield p
 
     # Fixture with cart money and phones
     @pytest.fixture()
     def purchase_with(self):
-        p = Purchase(10000, [       # Instantiating a new Purchase class with total price and phones added
+        p = Purchase(10000, [
             "Motorola G99",
             "iPhone 99",
             "Samsung Galaxy 99",
@@ -29,20 +33,23 @@ class Test:
 
         yield p
 
-        del p                       # This should not be necessary
-
     # input = test method parameter, result = total price, expected = whether result was indeed expected
     @pytest.mark.parametrize("input, result, expected", [
-        (True, 10200, True),
-        (True, 10000, False),
-        (True, 0, False),
-        (False, 9800, True),
-        (False, 10000, False),
-        (False, 0, False),
+        (True, 10200, True),        # Valid, price should increase with 200
+        (True, 10000, False),       # Invalid, price should increase
     ])
     # Test toggling internet package on or off, purchase = fixture
     def test_internet_package(self, purchase_with, input, result, expected):
         assert (purchase_with.internet_package(input) == result) == expected
+
+    # input = test method parameter, result = total price, expected = whether result was indeed expected
+    @pytest.mark.parametrize("input, result, expected", [
+        (False, 9800, True),        # Valid, price should decrease with 200
+        (False, 10000, False),      # Invalid, price should decrease
+    ])
+    # Test toggling internet package on or off, purchase = fixture
+    def test_internet_package(self, purchase_internet, input, result, expected):
+        assert (purchase_internet.internet_package(input) == result) == expected
 
     # Testing Incrementing phone lines, purchase = fixture
     def test_inc_total_phone_lines(self, purchase):
@@ -79,17 +86,16 @@ class Test:
 
     # model = Phone model (String)  result = expected total price   expected = added to list
     @pytest.mark.parametrize("model, result, expected", [
-        ("Motorola G99", 800, True),
+        ("Motorola G99", 800, True),                    # Test correct phone models * 5
         ("iPhone 99", 6000, True),
         ("Samsung Galaxy 99", 1000, True),
         ("Sony Xperia 99", 900, True),
         ("Huawei 99", 900, True),
-        ("G99", 0, False),
-        ("", 0, False),
-        ("Huawei 99 Sony Xperia 99", 0, False),
-        ("æøå-.,+0&/(!\"#%¤&?`)=âàáä*`|", 0, False),
-        (None, 0, False),
-
+        ("G99", 0, False),                              # Test subpart of string
+        ("", 0, False),                                 # Test an empty string
+        ("Huawei 99 Sony Xperia 99", 0, False),         # Test to strings concatenated
+        ("æøå-.,+0&/(!\"#%¤&?`)=âàáä*`|", 0, False),    # Test uncommon characters
+        (None, 0, False),                               # Test None
     ])
     # Testing selecting a phone, as well as list status, purchase = fixture
     def test_select_cellphone(self, model, result, purchase, expected):
@@ -101,15 +107,16 @@ class Test:
 
     # model = Phone model (String)  result = expected total price   expected = Whether the combination is correct or not
     @pytest.mark.parametrize("model, result, expected", [
-        ("Motorola G99", 9200, True),
+        ("Motorola G99", 9200, True),                   # Test correct phone models * 5
         ("iPhone 99", 4000, True),
         ("Samsung Galaxy 99", 9000, True),
         ("Sony Xperia 99", 9100, True),
         ("Huawei 99", 9100, True),
-        ("huawei 98", 9100, False),
-        ("iPhone 99 Samsung Galaxy 99", 4000, False),
-        ("", 0, False),
-        (None, 0, False),
+        ("huawei 98", 9100, False),                     # Test a similar string
+        ("iPhone 99 Samsung Galaxy 99", 4000, False),   # Test to strings concatenated
+        ("æøå-.,+0&/(!\"#%¤&?`)=âàáä*`|", 0, False),  # Test uncommon characters
+        ("", 0, False),                                 # Test an empty string
+        (None, 0, False),                               # Test None
     ])
     # Testing unselecting a phone, as well as list status, purchase_with = fixture
     def test_unselect_cellphone(self, model, result, expected, purchase_with):
@@ -125,16 +132,16 @@ class Test:
     # purchase_cases = Purchase class test case, expected = if allowed to buy or not
     # Purchase class constructor: (total_price=0, chosen_phones=None, phone_lines=0, internet_connection=False)
     @pytest.mark.parametrize("purchase_cases, expected", [
-        (Purchase(), False),
-        (Purchase(10000), False),
-        (Purchase(10000, ["Motorola G99"]), True),
-        (Purchase(1, [], 5), True),
-        (Purchase(50000, [], 0, True), True),
-        (Purchase(382.89, ["Motorola G99"], 8, True), True),
-        (Purchase(-1, ["Motorola G99"], 8, True), False),
-        (Purchase(0, ["Sad dog"], 8, True), False),
-        (Purchase(0.01, [None, None], -1), True),
-        (Purchase(42, [], -1, 0), False),
+        (Purchase(), False),                                    # Invalid, empty purchase
+        (Purchase(10000), False),                               # Invalid, empty purchase with a total price > 0
+        (Purchase(10000, ["Motorola G99"]), True),              # Valid, price = 10000, and 1 phone chosen
+        (Purchase(1, [], 5), True),                             # Valid, price > 0 and 5 phone lines
+        (Purchase(50000, [], 0, True), True),                   # Valid, price > 0 and internet package chosen
+        (Purchase(382.89, ["Motorola G99"], 8, True), True),    # Valid, price = float > 0, phone chosen, phone lines chosen and internet chosen
+        (Purchase(-1, ["Motorola G99"], 8, True), False),       # Invalid, price < 0
+        (Purchase(0, ["Sad dog"], 8, True), False),             # Invalid, price == 0
+        (Purchase(0.01, [None, None], -1), True),               # Valid, price > 0, "phones chosen"
+        (Purchase(42, [], -1, 0), False),                       # Invalid, nothing in cart (phone lines < 0)
     ])
     # Testing when user wants to buy a phone
     def test_buy_message(self, purchase_cases, expected):
