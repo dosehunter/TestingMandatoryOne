@@ -153,6 +153,8 @@ class TestPurchase:
 
 
 
+# This is just an alternative
+
 ''' # Alternative 
     @pytest.mark.parametrize("purchase, input, result, expected", [
         (Purchase(10000, [], 0 ,False), True, 10200, True),        # Valid, price should increase with 200
